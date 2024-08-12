@@ -1,2 +1,2 @@
-# TPBmodelExtension
-John, Rishi, and Nina play with TPB code from initial team
+# temporally-biased-planned-behavior
+Code repository for paper of temporally biased planned behavior

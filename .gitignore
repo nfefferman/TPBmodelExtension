@@ -1,5 +1,9 @@
 ### JupyterNotebooks ###
 
+
+#Data files
+*.csv
+
 .ipynb_checkpoints
 .ipynb_checkpoints/*
 */.ipynb_checkpoints/*

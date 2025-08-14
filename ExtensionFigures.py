@@ -43,7 +43,7 @@ seed = 0
 
 
 
-def FigFromSim(alpha1, alpha2,threshold_x, immediacy,x1init=0,x2init=0, save = False, file_loc = None, plttitle = ""):
+def FigFromSim(alpha1, alpha2,threshold_x, immediacy,x1init=0,x2init=0, save = False, file_loc = None, plttitle = "", negative = False ):
     A = np.ones((n,n))-np.eye(n) 
 
     alphas = np.sort(np.array([alpha1, alpha2]))[::-1]
@@ -53,8 +53,12 @@ def FigFromSim(alpha1, alpha2,threshold_x, immediacy,x1init=0,x2init=0, save = F
         growth='symlogistic', threshold_x=threshold_x, 
         immediacy_parameter=immediacy)
     # INTEGRATE
-    t, x, y = integrate_negative_system(system, t_max=tmax, 
-            time_step=time_step, max_events=10) 
+    if(negative):
+        t, x, y = integrate_negative_system(system, t_max=tmax, 
+                time_step=time_step, max_events=1000,x0=x0)
+    else:
+        t, x, y = integrate_system(system, t_max=tmax, 
+                time_step=time_step, max_events=1000,x0=x0)  
     a = np.copy(alphas)
 
     if(save):
@@ -85,7 +89,7 @@ def FigFromSim(alpha1, alpha2,threshold_x, immediacy,x1init=0,x2init=0, save = F
 
     return(fig)
 
-def TwoFigsFromSim(alpha1, alpha2,threshold_x, immediacy,x1init=0,x2init=0, save = False, file_loc = None, plttitle = ""):
+def TwoFigsFromSim(alpha1, alpha2,threshold_x, immediacy,x1init=0,x2init=0, save = False, file_loc = None, plttitle = "", negative = False):
     A = np.ones((n,n))-np.eye(n) 
 
     alphas = np.sort(np.array([alpha1, alpha2]))[::-1]
@@ -95,8 +99,12 @@ def TwoFigsFromSim(alpha1, alpha2,threshold_x, immediacy,x1init=0,x2init=0, save
         growth='symlogistic', threshold_x=threshold_x, 
         immediacy_parameter=immediacy)
     # INTEGRATE
-    t, x, y = integrate_negative_system(system, t_max=tmax, 
-            time_step=time_step, max_events=10,x0=x0) 
+    if(negative):
+        t, x, y = integrate_negative_system(system, t_max=tmax, 
+                time_step=time_step, max_events=1000,x0=x0)
+    else:
+        t, x, y = integrate_system(system, t_max=tmax, 
+                time_step=time_step, max_events=1000,x0=x0)  
     a = np.copy(alphas)
 
     if(save):
@@ -172,5 +180,5 @@ def FigFromData(file_loc, plttitle = ""):
 
 
 
-TwoFigsFromSim(0.1,0.6,threshold_x, 0.086, plttitle="Title")
+TwoFigsFromSim(0.1,0.6,threshold_x, 0.046, plttitle="Test figure", negative=True)
 plt.show()

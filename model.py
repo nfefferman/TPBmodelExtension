@@ -158,7 +158,7 @@ def make_system(A, alphas, shiftA=0, scaleA=1, constantA=None, shiftS=-0.5,
     scaleS=1, constantS=None, shiftC=0, scaleC=1, constantC=None, 
     growth='logistic', action_influence_evolution=None, threshold_x=None, 
     immediacy_parameter=None, primacy_parameter=None, recency_parameter=None):
-    '''Make a dynamical system.
+    ''' Make a dynamical system.
     
     Parameters
     ----------
@@ -217,7 +217,7 @@ def make_system(A, alphas, shiftA=0, scaleA=1, constantA=None, shiftS=-0.5,
     growth : function or string in ['linear' | 'exponential' | 'logistic']
        (default='logistic')
        Set or select a functional from for the growth of intentions.  If 'g' is
-       a function. Intentions grow like $\dot x = g(x)$ (in the absense of 
+       a function. Intentions grow like $dot x = g(x)$ (in the absense of 
        other mechanisms).
        
     action_influence_evolution : function (default=None)
@@ -472,7 +472,159 @@ def integrate_system(system, t_max=10.0, time_step=0.01, X0=None, x0=None,
     X_array = np.concatenate(X_list, axis=1)
     Y_array = np.concatenate(Y_list, axis=1)
     
-    return t_array, X_array, Y_array       
+    return t_array, X_array, Y_array      
+
+
+def integrate_negative_system(system, t_max=10.0, time_step=0.01, X0=None, x0=None, 
+    y0=None, stopping_condition=None, threshold_x=None, reset_x=0, 
+    max_events=1E3, tol=1E-20):
+    '''Integrate the function 'system' until time 't_max'.
+    
+    Parameters
+    ----------
+    system : function with numerical attributes
+       The system to be integrated.
+    
+    t_max : float (default=10.0)
+       End time of integration.
+
+    time_step : float (default=0.01)
+       Step size at which integration should be evaluated.
+       
+    X0 : 1D array (default=None)
+       Initial condition for intentions and nudge values.
+       
+    x0 : 1D array (default=None)
+       Initial condition for intentions.  If x0 is None, initialize 
+       with a 1D array of numbers chosen uniformly at random in [0,0.25]. The 
+       argument 'x0' is only used when 'X0' is None.
+       
+    y0 : 1D arrat (default=None)
+       Initial condition for nudge values. If y0 is None, initialize 
+       with a 1D array of zeros. The argument 'y0' is only used when 'X0' is 
+       None. 
+       
+    stopping_condition : function with attributes 'terminal' and 'direction'
+       (default=threshold_x-np.max(x[:len(x)//2]) with 'terminal=True' and 
+       'direction=-1')
+       Stopping condition for the integrator. Whenever the stopping condition
+       is reached, an action occurs. The corresponding intention value is reset
+       to 'reset_x' and the corresponding action counter increases by 1.
+       
+    threshold_x : float (default=None)
+       Threshold parameter for the default stopping condition. This option is 
+       available to override the threshold parameter given by the system.
+
+    reset_x : float (default=0)
+       Whenever the stopping condition is reached, intention values greater 
+       than or equal to 1 are set to 'reset_x'.
+       
+    max_events : integer (default=1E3)
+       Number of actions after which the integration should be stopped, even if
+       the time 't_max' is not reached. Think of this as an emergency break.
+
+    tol : float (default=1E-20)
+       Tolerance value for numerical `is_geq` function in the threshold 
+       operation.
+       
+    Returns
+    -------
+    t_array : 1D array
+       Array of time stamps
+    
+    X_array : 2D array
+       Array of intentions and nudge values 
+       
+    Y_array : 2D array
+       Array of action counts
+    '''
+    # find n
+    output = system()
+    n = output.shape[0]//2
+    
+    # set initial condition
+    if X0 is None:
+        if x0 is None:
+            x0 = np.random.uniform(size=n)*0.25
+        
+        if y0 is None:
+            y0 = np.zeros(n)
+            
+        X0 = np.concatenate([x0,y0])
+        
+    # set threshold for x
+    if threshold_x is None:
+        threshold_x = system.threshold_x
+        
+    # set default stopping condition
+    if stopping_condition is None:
+        
+        def stopping_condition(t, x): return min([threshold_x-np.max(x[:len(x)//2]),np.min(x[:len(x)//2])+threshold_x])
+        stopping_condition.terminal = True
+        stopping_condition.direction = -1
+            
+    # integrate
+    t, counter = 0.0, 0
+    X = X0 # initial state
+    Y = np.zeros(n) # initial count
+    
+    # initialize lists
+    t_list = [np.zeros(1)]
+    X_list = [np.zeros((2*n,1 ))]
+    X_list[0][:,0] = X0
+    Y_list = [np.zeros((n, 1))]
+    Y_list[0][:,0] = Y
+    
+    while (t < t_max and counter < max_events):
+        
+        #print('counter', counter, t)
+        
+        # integrate until threshold is reached
+        t_eval=np.arange(t,t_max, time_step)
+        if t_eval[-1]>t_max:
+            t_eval = t_eval[:-1]
+        sol = solve_ivp(system, [t, t_max], X, events=stopping_condition, 
+                        t_eval=t_eval)
+        
+        if len(sol.t_events[0]): 
+            # collect state (t, x, y) at threshold
+            t = sol.t_events[0][0]
+            X = sol.y_events[0][0]   
+               
+            # update state at threshold
+            x, y = X[:n], X[n:]
+            plusupdates = np.array(isgeq(x,threshold_x, tol=tol), dtype=float)
+            minusupdates = np.array(isgeq(-x,threshold_x,tol=tol),dtype=float)
+            pr = system.primacy_parameter
+            ymax = 1. #system.immediacy_parameter 
+            new_x = x + plusupdates*(reset_x-x)+ minusupdates*(reset_x-x)
+            #new_y = ((1-plusupdates-minusupdates)*y + plusupdates*(pr*y/2 + (1-pr/2)*ymax))-minusupdates*(pr*y/2+(1-pr/2)*ymax)
+            new_y = y+plusupdates-minusupdates
+            new_X = np.concatenate([new_x, new_y])
+            new_Y = Y + plusupdates+minusupdates
+            
+        else:
+            t = t_max
+            new_X = X
+            new_Y = Y
+
+        # store solutions
+        t_list += [sol.t]
+        X_list += [sol.y]
+        Y_list += [np.vstack([Y for _ in range(len(sol.t)-1)]+[new_Y]).T]
+
+        X = new_X
+        Y = new_Y
+        
+        # update counter
+        counter += 1
+        
+    # make arrays
+    t_array = np.concatenate(t_list)
+    X_array = np.concatenate(X_list, axis=1)
+    Y_array = np.concatenate(Y_list, axis=1)
+    
+    return t_array, X_array, Y_array      
 
 def integrate_system_and_output_events(system, t_max=10.0, time_step=0.01, X0=None, x0=None, 
     y0=None, stopping_condition=None, threshold_x=None, reset_x=0, 

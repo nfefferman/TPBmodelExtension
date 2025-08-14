@@ -180,5 +180,8 @@ def FigFromData(file_loc, plttitle = ""):
 
 
 
-TwoFigsFromSim(0.1,0.6,threshold_x, 0.046, plttitle="Test figure", negative=True)
+TwoFigsFromSim(alpha1 = 0.1, alpha2 =0.6,
+                threshold_x=threshold_x,immediacy= 0.046, 
+                plttitle="Test figure",
+                negative=True)
 plt.show()

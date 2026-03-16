@@ -599,7 +599,7 @@ def integrate_negative_system(system, t_max=10.0, time_step=0.01, X0=None, x0=No
             ymax = 1. #system.immediacy_parameter 
             new_x = x + plusupdates*(reset_x-x)+ minusupdates*(reset_x-x)
             #new_y = ((1-plusupdates-minusupdates)*y + plusupdates*(pr*y/2 + (1-pr/2)*ymax))-minusupdates*(pr*y/2+(1-pr/2)*ymax)
-            new_y = y+plusupdates-minusupdates
+            new_y = (1-plusupdates-minusupdates)*y+plusupdates-minusupdates
             new_X = np.concatenate([new_x, new_y])
             new_Y = Y + plusupdates+minusupdates
             

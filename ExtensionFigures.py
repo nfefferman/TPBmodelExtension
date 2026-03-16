@@ -114,13 +114,12 @@ def TwoFigsFromSim(alpha1, alpha2,threshold_x, immediacy,x1init=0,x2init=0, save
     xticks = [0,500,1000,1500]
 
     
-    fig = plt.figure()
+    fig, axes = plt.subplots(1,2)
+    fig.suptitle(plttitle, fontsize = 12)
+
+    plt.subplots_adjust(wspace=0.4)
 
     ax1 = plt.subplot(1,2,1)
-    
-    # add column titles
-    plt.title(plttitle, fontsize=12)
-
     # plot simulation results
     for i in range(n):
         plt.plot(t, x[i], color=blues[i], ls='-', 
@@ -136,15 +135,15 @@ def TwoFigsFromSim(alpha1, alpha2,threshold_x, immediacy,x1init=0,x2init=0, save
     ax2 = plt.subplot(1,2,2) 
     for i in range(n):
         plt.plot(t, x[n+i], color=blues[i], ls='-', 
-            label='Individual '+str(i+1))
-    plt.ylim([-1.2,1.2])
+            label=r'Individual {} ($\alpha_{}={})$'.format(str(i+1),str(i+1),alphas[i]))
+    plt.ylim([-0.5,1.2])
     plt.xlim(xlims)
 
-    plt.xlabel('')
+    plt.xlabel('time')
     ax2.set_xticks(xticks)
     ax2.set_xticklabels([])
     plt.ylabel(r'Nudge effect $y_i$')
-
+    plt.legend()
 
     return(fig)
 
@@ -180,8 +179,11 @@ def FigFromData(file_loc, plttitle = ""):
 
 
 
-TwoFigsFromSim(alpha1 = 0.1, alpha2 =0.6,
-                threshold_x=threshold_x,immediacy= 0.046, 
-                plttitle="Test figure",
-                negative=True)
+TwoFigsFromSim(alpha1 = 0.45, alpha2 =0.7,
+                threshold_x=threshold_x,immediacy= 0.086, 
+                plttitle="Net Increase",
+                x1init=0,
+                x2init=-0,
+                negative=False)
+plt.savefig("C:/Users/jonmc/Documents/TPBmodelExtension/images/Fig6.png", dpi = 300)
 plt.show()

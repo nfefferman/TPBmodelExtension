@@ -6,7 +6,7 @@ TPBModelExtensionTeX/*
 images/*
 
 #Data files
-DataFiles/
+DataFiles/*
 *.csv
 *.xlsx
 

@@ -1,8 +1,13 @@
 ### JupyterNotebooks ###
 
 
+#TeX files
+TPBModelExtensionTeX/*
+images/*
+
 #Data files
 *.csv
+*.xlsx
 
 .ipynb_checkpoints
 .ipynb_checkpoints/*

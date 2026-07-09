@@ -1,14 +1,14 @@
 ### JupyterNotebooks ###
 
 #VScode
-.vscode/*
+.vscode/
 
 #TeX files
-TPBModelExtensionTeX/*
-images/*
+TPBModelExtensionTeX/
+images/
 
 #Data files
-DataFiles/*
+DataFiles/
 *.csv
 *.xlsx
 

@@ -270,5 +270,5 @@ SepFigsFromSim(alpha1 = 0.45, alpha2 =0.6,
                 negative=False)
 
 plt.gcf().set_size_inches(5, 8)
-plt.savefig("C:/Users/jonmc/Documents/Research/TPBmodelExtension/images/InitialConditionInd.png", dpi = 300, bbox_inches="tight")
+#plt.savefig("C:/Users/jonmc/Documents/Research/TPBmodelExtension/images/InitialConditionInd.png", dpi = 300, bbox_inches="tight")
 plt.show()

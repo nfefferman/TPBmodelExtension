@@ -31,32 +31,6 @@ def isgeq(a, b, tol=1E-20):
         
     return comparison
 
-def isleq(a, b, tol=1E-20):
-    '''Perform an element-wise check if an elements of an array 'a' are less
-    or equal to the elements of an array 'b' while accounting for
-    representation errors up to an absolute tolerance 'tol'.
-    
-    Parameters
-    ----------
-    a : a scalar or array
-       Number (or array of numbers) to be checked for being greater than or
-       equal to the number (or array of numbers) 'b'
-       
-    b : a scalar or array
-       If 'b' is an array, it must have the same dimensions as 'a'
-       
-    tol : float (default=1E-20)
-       Tolerance value
-    ''' 
-    if hasattr(b, "__len__"):
-        b_array = b
-    else:
-        b_array = b*np.ones(a.shape)
-        
-    comparison = np.logical_or(a<b_array, np.isclose(a,b, atol=tol))
-        
-    return comparison
-
 
 def random_uniform_force_mean(low=-0.4, high=1., size=10, iteration=0, max_iter=100):
     '''Draw numbers from a uniform distribution with a set mean value.

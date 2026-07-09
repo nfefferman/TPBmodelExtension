@@ -158,7 +158,7 @@ def make_system(A, alphas, shiftA=0, scaleA=1, constantA=None, shiftS=-0.5,
     scaleS=1, constantS=None, shiftC=0, scaleC=1, constantC=None, 
     growth='logistic', action_influence_evolution=None, threshold_x=None, 
     immediacy_parameter=None, primacy_parameter=None, recency_parameter=None):
-    ''' Make a dynamical system.
+    '''Make a dynamical system.
     
     Parameters
     ----------
@@ -214,10 +214,10 @@ def make_system(A, alphas, shiftA=0, scaleA=1, constantA=None, shiftS=-0.5,
        a constant value in the ODE. Set 'constantC' to 1 to create a system 
        without any effect of perceived social norms.
        
-    growth : function or string in ['linear' | 'exponential' | 'logistic']
+    growth : function or string in ['linear' | 'exponential' | 'logistic' | 'symlogistic']
        (default='logistic')
        Set or select a functional from for the growth of intentions.  If 'g' is
-       a function. Intentions grow like $dot x = g(x)$ (in the absense of 
+       a function. Intentions grow like $\dot x = g(x)$ (in the absense of 
        other mechanisms).
        
     action_influence_evolution : function (default=None)
@@ -254,7 +254,7 @@ def make_system(A, alphas, shiftA=0, scaleA=1, constantA=None, shiftS=-0.5,
     # define growth function
     if growth=='logistic':
         g = lambda x: x*(1-x)
-    if growth=='symlogistic':
+    elif growth=='symlogistic':
         g = lambda x: (x+1)*(1-x)
     elif growth=='exponential':
         g = lambda x: x
@@ -472,8 +472,7 @@ def integrate_system(system, t_max=10.0, time_step=0.01, X0=None, x0=None,
     X_array = np.concatenate(X_list, axis=1)
     Y_array = np.concatenate(Y_list, axis=1)
     
-    return t_array, X_array, Y_array      
-
+    return t_array, X_array, Y_array       
 
 def integrate_negative_system(system, t_max=10.0, time_step=0.01, X0=None, x0=None, 
     y0=None, stopping_condition=None, threshold_x=None, reset_x=0, 
@@ -625,6 +624,8 @@ def integrate_negative_system(system, t_max=10.0, time_step=0.01, X0=None, x0=No
     Y_array = np.concatenate(Y_list, axis=1)
     
     return t_array, X_array, Y_array      
+
+
 
 def integrate_system_and_output_events(system, t_max=10.0, time_step=0.01, X0=None, x0=None, 
     y0=None, stopping_condition=None, threshold_x=None, reset_x=0, 

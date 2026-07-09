@@ -1,5 +1,7 @@
 ### JupyterNotebooks ###
 
+#VScode
+.vscode/*
 
 #TeX files
 TPBModelExtensionTeX/*
